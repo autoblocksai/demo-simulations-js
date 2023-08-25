@@ -1,0 +1,16 @@
+{
+  "name": "demo-simulations",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "simulation": "AUTOBLOCKS_SIMULATION_ID=demo-js-$(date +%Y%m%d-%H%M%S) tsx src/index.ts"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@autoblocks/client": "^0.0.5",
+    "openai": "^4.2.0",
+    "tsx": "^3.12.7",
+    "typescript": "^5.2.2"
+  }
+}
