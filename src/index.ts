@@ -1,33 +1,35 @@
 import OpenAI from 'openai';
 import { AutoblocksTracer } from '@autoblocks/client';
+import { CreateChatCompletionRequestMessage } from 'openai/resources/chat';
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const tracer = new AutoblocksTracer(process.env.AUTOBLOCKS_INGESTION_KEY as string);
 
-const inputs: { traceId: string, q: string }[] = [
+const inputs: { traceId: string, content: string }[] = [
   {
     traceId: 'mount-everest-serious',
-    q: 'Mount Everest is the tallest mountain the world',
+    content: 'Mount Everest is the tallest mountain the world',
   },
   {
     traceId: 'mount-everest-playful',
-    q: 'OMG did you know mount everest is the tallest mountain in the world ???',
+    content: 'OMG did you know mount everest is the tallest mountain in the world ???',
   },
 ];
-
-
 
 const main = async () => {
   for (const input of inputs) {
     tracer.setTraceId(input.traceId);
 
     const prompt = `Categorize the user's input as either serious or playful.`;
-    await tracer.sendEvent('ai.request', { properties: { prompt } });
+    const messages: CreateChatCompletionRequestMessage[] = [
+      { role: 'system', content: prompt }, 
+      { role: 'user', content: input.content },
+    ];
+    await tracer.sendEvent('ai.request', { properties: { input: messages } });
 
     const completion = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
-      messages: [{ role: 'system', content: prompt }, { role: 'user', content: input.q }],
-      temperature: 0.5,
+      messages,
     });
 
     const output = completion.choices[0].message;
